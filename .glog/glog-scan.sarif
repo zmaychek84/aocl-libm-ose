@@ -1,0 +1,1977 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-a7310a01-4795-4da8-b458-d89df71c6379",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability \"Security Concern: Use of subprocess call with shell=True Detected\" in Python arises when the `subprocess.Popen` function is used with the `shell=True` argument. This can lead to security risks such as shell injection, where an attacker can execute arbitrary commands on the system. This is particularly dangerous if the input to the command is not properly sanitized, as it can allow an attacker to execute malicious commands.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, avoid using `shell=True` unless absolutely necessary. Instead, pass the command and its arguments as a list. This approach avoids invoking the shell and reduces the risk of shell injection.\n\n### Source Code Fix Recommendation\n\nReplace the vulnerable code:\n\n```python\np = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n```\n\nWith a safer alternative:\n\n```python\nimport shlex\n\n# Assuming cmd is a string, split it into a list\ncmd_list = shlex.split(cmd)\np = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n```\n\n### Library Dependencies\n\nThe code example requires the following standard library modules to execute properly:\n\n- `subprocess`\n- `shlex`\n\nThese modules are part of the Python Standard Library and do not require additional installation.\n\n### Relevant Resources\n\n- [OWASP Command Injection](https://owasp.org/www-community/attacks/Command_Injection)\n- [CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')](https://cwe.mitre.org/data/definitions/78.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B602"
+                ]
+              }
+            },
+            {
+              "id": "glog-09c2c2ad-7e56-4f3f-9084-610e2ab0c50e",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strlen` function in C++ is used to find the length of a string. However, it can lead to vulnerabilities if not used properly. The function counts the number of characters in a string until it reaches a null character (`\\0`). If the string is not properly null-terminated, `strlen` will continue reading memory beyond the intended boundary, leading to a buffer overflow. This can result in crashes, incorrect behavior, or potential code execution.\n\nIn the specific case of `strlen(regex)`, if `regex` is not a null-terminated string, it can lead to the aforementioned issues.\n\n## Mitigation Advice\n\nTo mitigate this issue, always ensure that your strings are null-terminated. This can be done by initializing your strings with a null character at the end, or by manually adding a null character at the end of your string after it has been modified.\n\nAdditionally, consider using safer alternatives to `strlen` that take a maximum length parameter, such as `strnlen`. This function will stop reading memory after a certain number of characters, even if it has not encountered a null character.\n\n## Source Code Fix Recommendation\n\nReplace `strlen(regex)` with `strnlen(regex, MAX_LENGTH)`, where `MAX_LENGTH` is the maximum expected length of your string.\n\n```cpp\n#include <string.h>\n\n#define MAX_LENGTH 100\n\n// ...\n\nsize_t length = strnlen(regex, MAX_LENGTH);\n```\n\n## Library Dependencies\n\nThe `strlen` and `strnlen` functions are part of the `<string.h>` library in C++. Therefore, this library must be included for the code to execute properly.\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-9a993236-e80f-44c6-a667-361d2a06ab4b",
+              "help": {
+                "text": "",
+                "markdown": "### Description of \"Unsecured URL\" Vulnerability in C++ Programming Language\n\nThe \"Unsecured URL\" vulnerability occurs when a program uses URLs that are not properly secured, potentially exposing sensitive data to unauthorized parties. In C++, this can happen when URLs are hardcoded or constructed without proper validation or encryption, leading to potential data leaks or man-in-the-middle attacks.\n\n### General Mitigation Advice\n\n1. **Use HTTPS**: Always use HTTPS instead of HTTP to ensure that data is encrypted during transmission.\n2. **Input Validation**: Validate and sanitize all URL inputs to prevent injection attacks.\n3. **Environment Variables**: Store URLs in environment variables or configuration files instead of hardcoding them.\n4. **Secure Libraries**: Use libraries that support secure connections and have been vetted for security vulnerabilities.\n\n### Source Code Fix Recommendation\n\nBelow is an example of a C++ code snippet that demonstrates an unsecured URL vulnerability and its fix:\n\n#### Vulnerable Code\n\n```cpp\n#include <iostream>\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl = curl_easy_init();\n    if(curl) {\n        // Vulnerable URL\n        curl_easy_setopt(curl, CURLOPT_URL, \"http://wiki\");\n        res = curl_easy_perform(curl);\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\", curl_easy_strerror(res));\n        curl_easy_cleanup(curl);\n    }\n    return 0;\n}\n```\n\n#### Fixed Code\n\n```cpp\n#include <iostream>\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl = curl_easy_init();\n    if(curl) {\n        // Secure URL\n        curl_easy_setopt(curl, CURLOPT_URL, \"https://wiki\");\n        res = curl_easy_perform(curl);\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\", curl_easy_strerror(res));\n        curl_easy_cleanup(curl);\n    }\n    return 0;\n}\n```\n\n### Library Dependencies\n\nTo execute the above code, the following library dependencies are required:\n\n- `libcurl`: A free and easy-to-use client-side URL transfer library, supporting a range of protocols including HTTPS.\n\n### Relevant OWASP Resources\n\n- [OWASP Secure Coding Practices - Quick Reference Guide](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-319: Cleartext Transmission of Sensitive Information](https://cwe.mitre.org/data/definitions/319.html)\n\nThese resources provide further guidance on secure coding practices and understanding vulnerabilities related to unsecured URLs."
+              },
+              "properties": {
+                "tags": [
+                  "DS137138"
+                ]
+              }
+            },
+            {
+              "id": "glog-27718ee5-0f0c-4894-b7c3-87553b3da9fc",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strlen(str)` function in C++ is used to find the length of a string. The vulnerability arises when the string `str` is not null-terminated, which can lead to buffer overflows, memory corruption, and other unexpected behaviors. This is because `strlen(str)` counts characters until it encounters a null character (`\\0`), and if it doesn't find one, it could continue reading and returning data from memory beyond the intended boundary of the string.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, always ensure that your strings are null-terminated. This can be done by initializing your strings with a null character at the end, or by manually adding a null character at the end of your strings after they have been modified.\n\nAlso, consider using safer alternatives to `strlen(str)`, such as `strnlen(str, max_len)`, which takes a maximum length parameter and will not read beyond this limit, even if it doesn't encounter a null character.\n\n## Source Code Fix Recommendation\n\nInstead of:\n\n```cpp\n#include <cstring>\n\nchar str[] = \"Hello, World!\";\nsize_t len = strlen(str);\n```\n\nUse:\n\n```cpp\n#include <cstring>\n\nchar str[] = \"Hello, World!\";\nsize_t max_len = sizeof(str) / sizeof(str[0]) - 1;\nsize_t len = strnlen(str, max_len);\n```\n\n## Library Dependencies\n\nThe `strlen` and `strnlen` functions are part of the `<cstring>` library in C++.\n\n## References\n\n- [OWASP C++](https://owasp.org/www-pdf-archive/OWASP_SCP_v2.pdf)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-305d4cc5-e5e9-42ca-8e81-ffd88e3d79bf",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strlen` function in C and C++ is used to find the length of a string. However, it can be problematic if not used correctly. The function counts the number of characters in a string until it reaches a null character (`\\0`). If the string is not properly null-terminated, `strlen` will continue reading memory beyond the intended boundary, leading to undefined behavior, which can include crashes, incorrect program behavior, or even security vulnerabilities such as buffer overflows.\n\nIn the provided code snippet, `strlen(\"]]>\")`, there is no direct vulnerability as the string is a string literal which is automatically null-terminated by the compiler. However, if the string was user input or came from an untrusted source, there could be potential issues.\n\n## Mitigation Advice\n\nTo mitigate potential issues with `strlen`, ensure that all strings are properly null-terminated. Be cautious when dealing with user input or data from untrusted sources. Consider using safer alternatives to `strlen` when possible, such as `strnlen`, which takes a maximum length parameter and will not read beyond this length, even if it does not encounter a null character.\n\n## Source Code Fix Recommendation\n\nIn the provided code snippet, there is no direct fix needed as the string is a string literal and automatically null-terminated. However, if the string was user input or from an untrusted source, you could use `strnlen` as follows:\n\n```cpp\n#include <string.h>\n\n// Define a maximum length for the string\n#define MAX_LENGTH 100\n\n// ...\n\nchar* str = /* string from user or untrusted source */;\nsize_t length = strnlen(str, MAX_LENGTH);\n```\n\n## Library Dependencies\n\nThe `strlen` function is part of the C standard library, so no additional libraries are needed to use it. If using `strnlen`, this is also part of the C standard library (specifically, it is included in `string.h`).\n\n## Resources\n\n- [OWASP C/C++ Vulnerabilities](https://owasp.org/www-pdf-archive/OWASP_SCP_Quick_Reference_Guide_v2.pdf)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-09ec0439-c42b-4716-8ac7-dbe800d56ff7",
+              "help": {
+                "text": "",
+                "markdown": "### Description of \"Unsecured URL\" Vulnerability in C++ Programming Language\n\nAn \"Unsecured URL\" vulnerability occurs when a program uses URLs that are not secured with HTTPS, potentially exposing sensitive data to interception or tampering by attackers. In C++ applications, this can happen when URLs are hardcoded or constructed without considering security implications, leading to data being transmitted over an unencrypted channel.\n\n### General Mitigation Advice\n\n1. **Use HTTPS**: Always use HTTPS instead of HTTP to ensure that data is encrypted during transmission.\n2. **Validate URLs**: Ensure that URLs are validated and sanitized before use.\n3. **Configuration**: Use configuration files or environment variables to manage URLs, allowing for easier updates and security management.\n4. **Security Libraries**: Utilize libraries that enforce secure connections and provide mechanisms for validating certificates.\n\n### Source Code Fix Recommendation\n\nIf your C++ application is using an unsecured URL, you should update the code to use HTTPS. Here's an example of how you might fix this in a C++ application:\n\n```cpp\n#include <iostream>\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n    curl = curl_easy_init();\n    if(curl) {\n        // Use HTTPS instead of HTTP\n        curl_easy_setopt(curl, CURLOPT_URL, \"https://msdn.microsoft.com\");\n\n        // Perform the request, res will get the return code\n        res = curl_easy_perform(curl);\n\n        // Check for errors\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\", curl_easy_strerror(res));\n\n        // Cleanup\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n    return 0;\n}\n```\n\n### Library Dependencies\n\nTo execute the above code example, you need the following library:\n\n- **libcurl**: A free and easy-to-use client-side URL transfer library, supporting a range of protocols including HTTPS.\n\n### OWASP Resources\n\n- [OWASP Transport Layer Protection Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html)\n- [OWASP Secure Coding Practices - Quick Reference Guide](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-319: Cleartext Transmission of Sensitive Information](https://cwe.mitre.org/data/definitions/319.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS137138"
+                ]
+              }
+            },
+            {
+              "id": "glog-50e66a79-1ece-44d2-8656-c20352b66268",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability associated with the `strlen` function in C++ arises when it is used without proper validation of the input string. If `strlen` is called on a string that is not null-terminated, it can lead to undefined behavior, including buffer overflows, which can be exploited by attackers to execute arbitrary code or cause a denial of service.\n\n### General Mitigation Advice\n\n1. **Input Validation**: Always validate input strings to ensure they are null-terminated before passing them to `strlen`.\n2. **Use Safer Alternatives**: Consider using safer string handling functions like `strnlen` which allows specifying a maximum length to prevent reading beyond the buffer.\n3. **Memory Management**: Ensure proper memory allocation and deallocation to avoid buffer overflows and memory leaks.\n4. **Static Analysis Tools**: Use static analysis tools to detect potential vulnerabilities in the code.\n\n### Source Code Fix Recommendation\n\nTo mitigate the vulnerability when using `strlen(temp_dir)`, ensure that `temp_dir` is null-terminated and consider using `strnlen` to specify a maximum length:\n\n```cpp\n#include <cstring> // Required for strlen and strnlen\n#include <iostream>\n\n#define MAX_DIR_LENGTH 256\n\nint main() {\n    char temp_dir[MAX_DIR_LENGTH];\n    // Ensure temp_dir is null-terminated\n    temp_dir[MAX_DIR_LENGTH - 1] = '\\0';\n\n    // Use strnlen to prevent reading beyond the buffer\n    size_t length = strnlen(temp_dir, MAX_DIR_LENGTH);\n\n    std::cout << \"Length of temp_dir: \" << length << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nTo execute the above code example, the following library dependencies are required:\n\n- `<cstring>`: Provides the `strlen` and `strnlen` functions.\n- `<iostream>`: Used for input and output operations.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n- [CWE-126: Buffer Over-read](https://cwe.mitre.org/data/definitions/126.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-6af74587-c308-4c07-89bd-a4501604c18c",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strlen()` function in C++ is used to find the length of a string. However, it can lead to vulnerabilities if not used properly. The function counts the number of characters in a string until it reaches a null character (`\\0`). If the string is not null-terminated, `strlen()` will continue reading memory until it encounters a null character, potentially leading to buffer overflows, memory corruption, and other undefined behaviors.\n\n## Mitigation Advice\n\nTo mitigate this issue, always ensure that your strings are null-terminated. Avoid using `strlen()` on strings that may not be null-terminated. Instead, consider using safer alternatives such as `strnlen()`, which takes an additional parameter to specify the maximum number of characters to be examined.\n\n## Source Code Fix Recommendation\n\nInstead of:\n\n```cpp\n#include <cstring>\n\nconst char* prefix = \"example\";\nsize_t length = strlen(prefix);\n```\n\nUse:\n\n```cpp\n#include <cstring>\n\nconst char* prefix = \"example\";\nsize_t length = strnlen(prefix, MAX_LENGTH);\n```\n\nWhere `MAX_LENGTH` is the maximum expected length of the string.\n\n## Library Dependencies\n\nThe code example requires the `<cstring>` library.\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n\nPlease note that the links provided are accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-545304a9-7e8a-455d-a3f9-daae432443ca",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-a2d72643-9346-4c07-9dce-a1b95886880b",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-c5e8c90d-c0b1-4eb2-b49c-8b2b8d373feb",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-29a01cc3-e7fb-4b99-bb92-8329f0656469",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-727f93b6-9e74-427c-aa06-096f2e070ba9",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-eff5a787-d8c5-49c3-8ea3-42cb0ed7cf27",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-4bc26ddf-3cf9-45ed-bdbd-48c22f87f0ea",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-0cbe5748-97d7-464e-9e86-d6f24ceaa374",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-7c798784-b295-4314-ba96-a64fbc78869a",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-e08dc5db-b19a-478e-8bb5-469a94b3816a",
+              "name": "GenericHardcodedEllipticCurve",
+              "shortDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve"
+              },
+              "fullDescription": {
+                "text": "Generic: Hard-coded Elliptic Curve: Generic: Hard-coded Elliptic Curve"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "helpUri": "https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md",
+              "help": {
+                "text": "Review to ensure that a TLS protocol agility is maintained.",
+                "markdown": "Visit [https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md](https://github.com/Microsoft/DevSkim/blob/main/guidance/DS440001.md) for guidance on this issue."
+              },
+              "properties": {
+                "DevSkimSeverity": "ManualReview",
+                "DevSkimConfidence": "High",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "tags": [
+                  "DS440100"
+                ]
+              }
+            },
+            {
+              "id": "glog-232e8855-3253-46dd-b0fe-06ba51798b4a",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strlen()` function in C++ is used to find the length of a string. However, it can lead to vulnerabilities if not used properly. The function counts the number of characters in a string up to but not including the null character. If the string is not null-terminated, `strlen()` will continue reading memory until it encounters a null byte, which can lead to buffer overflows, memory corruption, and other unexpected behavior.\n\n## Mitigation Advice\n\nTo mitigate this issue, always ensure that your strings are null-terminated. Avoid using `strlen()` on strings that may not be null-terminated. Instead, consider using safer alternatives that take the size of the buffer as an argument, such as `strnlen()`, which will not read past the specified length, even if it does not encounter a null byte.\n\n## Source Code Fix Recommendation\n\nInstead of:\n\n```cpp\n#include <cstring>\n\nchar ansi[100];\n// ... populate ansi ...\nsize_t len = strlen(ansi);\n```\n\nUse:\n\n```cpp\n#include <cstring>\n\nchar ansi[100];\n// ... populate ansi ...\nsize_t len = strnlen(ansi, sizeof(ansi));\n```\n\n## Library Dependencies\n\nThe code example requires the `<cstring>` library.\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-49228a35-d1b7-4a6e-a553-b2c501144c66",
+              "help": {
+                "text": "",
+                "markdown": "The \"Unsecured URL\" vulnerability is not specific to the C++ programming language. It is a general security issue that can occur in any programming language or system that involves the use of URLs. This vulnerability arises when a system or application allows the use of unsecured (non-HTTPS) URLs, which can expose the system or application to various attacks such as Man-in-the-Middle (MitM) attacks, eavesdropping, and data tampering.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, always use secure URLs (HTTPS) instead of unsecured ones (HTTP). HTTPS ensures that the communication between the client and the server is encrypted and secure. If you are developing a web application, consider implementing HTTP Strict Transport Security (HSTS) to enforce the use of HTTPS.\n\n## Source Code Fix Recommendation\n\nSince this is not a C++ specific issue, there's no C++ code to fix. However, if you are using URLs in your C++ code, make sure to use HTTPS URLs. For example, if you are using the `curl` library to make HTTP requests, you should use `https://` instead of `http://` in your URLs.\n\n```cpp\nCURL *curl = curl_easy_init();\nif(curl) {\n  CURLcode res;\n  curl_easy_setopt(curl, CURLOPT_URL, \"https://analogous.blogspot.com\");\n  /* Perform the request, res will get the return code */ \n  res = curl_easy_perform(curl);\n  /* Check for errors */ \n  if(res != CURLE_OK)\n    fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n            curl_easy_strerror(res));\n  /* always cleanup */ \n  curl_easy_cleanup(curl);\n}\n```\n\n## Library Dependencies\n\nThe above code example requires the `libcurl` library.\n\n## OWASP Resources\n\n- [Transport Layer Protection Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html)\n- [Unvalidated Redirects and Forwards Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html)\n\n## Common Weakness Enumeration (CWE)\n"
+              },
+              "properties": {
+                "tags": [
+                  "DS137138"
+                ]
+              }
+            },
+            {
+              "id": "glog-f3a3934d-7bfb-4d6e-b75b-86ed8fc3776b",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nAn \"Unsecured URL\" vulnerability in C++ programming language refers to the situation where a program uses an unsecured HTTP URL for communication, instead of a secured HTTPS URL. This can lead to a variety of security issues, such as Man-in-the-Middle (MitM) attacks, where an attacker can intercept and potentially alter the communication between the client and the server.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, always use secure HTTPS URLs for communication. HTTPS encrypts the data sent between the client and the server, making it much more difficult for an attacker to intercept or alter the communication.\n\n## Source Code Fix Recommendation\n\nIf you are using the `curl` library to make HTTP requests, you can simply replace the unsecured HTTP URL with a secured HTTPS URL. For example, if your code looks like this:\n\n```cpp\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n\n    curl = curl_easy_init();\n    if(curl) {\n        curl_easy_setopt(curl, CURLOPT_URL, \"http://www.apache.org\");\n        /* Perform the request, res will get the return code */\n        res = curl_easy_perform(curl);\n        /* Check for errors */\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n                    curl_easy_strerror(res));\n        /* always cleanup */\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n\n    return 0;\n}\n```\n\nYou can fix the vulnerability by changing the URL to \"https://www.apache.org\":\n\n```cpp\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n\n    curl = curl_easy_init();\n    if(curl) {\n        curl_easy_setopt(curl, CURLOPT_URL, \"https://www.apache.org\");\n        /* Perform the request, res will get the return code */\n        res = curl_easy_perform(curl);\n        /* Check for errors */\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n                    curl_easy_strerror(res));\n        /* always cleanup */\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n\n    return 0;\n}\n```\n\n## Library Dependencies\n\nThe above code example requires the `libcurl` library.\n\n## OWASP Resources\n\n- [OWASP Top 10 2017 Category A6 - Security Misconfiguration](https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration)\n\n## Common Weakness Enumeration (CWE)\n"
+              },
+              "properties": {
+                "tags": [
+                  "DS137138"
+                ]
+              }
+            },
+            {
+              "id": "glog-b68ae9c3-c070-4c96-a650-3c57ecc93224",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nAn \"Unsecured URL\" vulnerability in C++ programming language refers to the situation where a program uses an unsecured HTTP URL for communication, instead of a secured HTTPS URL. This can lead to a variety of security issues, such as Man-in-the-Middle (MitM) attacks, where an attacker can intercept and potentially alter the communication between the client and the server.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, always use secure HTTPS URLs for communication. HTTPS encrypts the data sent between the client and the server, making it much more difficult for an attacker to intercept or alter the communication.\n\n## Source Code Fix Recommendation\n\nIf you are using the `curl` library to make HTTP requests, you can simply replace the unsecured HTTP URL with a secured HTTPS URL. For example, if your code looks like this:\n\n```cpp\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n\n    curl = curl_easy_init();\n    if(curl) {\n        curl_easy_setopt(curl, CURLOPT_URL, \"http://www.apache.org\");\n        /* Perform the request, res will get the return code */\n        res = curl_easy_perform(curl);\n        /* Check for errors */\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n                    curl_easy_strerror(res));\n        /* always cleanup */\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n\n    return 0;\n}\n```\n\nYou can fix the vulnerability by changing the URL to \"https://www.apache.org\":\n\n```cpp\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n\n    curl = curl_easy_init();\n    if(curl) {\n        curl_easy_setopt(curl, CURLOPT_URL, \"https://www.apache.org\");\n        /* Perform the request, res will get the return code */\n        res = curl_easy_perform(curl);\n        /* Check for errors */\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n                    curl_easy_strerror(res));\n        /* always cleanup */\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n\n    return 0;\n}\n```\n\n## Library Dependencies\n\nThe above code example requires the `libcurl` library.\n\n## OWASP Resources\n\n- [OWASP Top 10 2017 Category A6 - Security Misconfiguration](https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration)\n\n## Common Weakness Enumeration (CWE)\n"
+              },
+              "properties": {
+                "tags": [
+                  "DS137138"
+                ]
+              }
+            },
+            {
+              "id": "glog-7dfdae57-fa3d-43eb-9b29-eaecc0bde4b3",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nAn \"Unsecured URL\" vulnerability in C++ programming language refers to the situation where a program uses an unsecured HTTP URL for communication, instead of a secured HTTPS URL. This can lead to a variety of security issues, such as Man-in-the-Middle (MitM) attacks, where an attacker can intercept and potentially alter the communication between the client and the server.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, always use secure HTTPS URLs for communication. HTTPS encrypts the data sent between the client and the server, making it much more difficult for an attacker to intercept or alter the communication.\n\n## Source Code Fix Recommendation\n\nIf you are using the `curl` library to make HTTP requests, you can simply replace the unsecured HTTP URL with a secured HTTPS URL. For example, if your code looks like this:\n\n```cpp\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n\n    curl = curl_easy_init();\n    if(curl) {\n        curl_easy_setopt(curl, CURLOPT_URL, \"http://www.apache.org\");\n        /* Perform the request, res will get the return code */\n        res = curl_easy_perform(curl);\n        /* Check for errors */\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n                    curl_easy_strerror(res));\n        /* always cleanup */\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n\n    return 0;\n}\n```\n\nYou can fix the vulnerability by changing the URL to \"https://www.apache.org\":\n\n```cpp\n#include <curl/curl.h>\n\nint main() {\n    CURL *curl;\n    CURLcode res;\n\n    curl_global_init(CURL_GLOBAL_DEFAULT);\n\n    curl = curl_easy_init();\n    if(curl) {\n        curl_easy_setopt(curl, CURLOPT_URL, \"https://www.apache.org\");\n        /* Perform the request, res will get the return code */\n        res = curl_easy_perform(curl);\n        /* Check for errors */\n        if(res != CURLE_OK)\n            fprintf(stderr, \"curl_easy_perform() failed: %s\\n\",\n                    curl_easy_strerror(res));\n        /* always cleanup */\n        curl_easy_cleanup(curl);\n    }\n\n    curl_global_cleanup();\n\n    return 0;\n}\n```\n\n## Library Dependencies\n\nThe above code example requires the `libcurl` library.\n\n## OWASP Resources\n\n- [OWASP Top 10 2017 Category A6 - Security Misconfiguration](https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration)\n\n## Common Weakness Enumeration (CWE)\n"
+              },
+              "properties": {
+                "tags": [
+                  "DS137138"
+                ]
+              }
+            },
+            {
+              "id": "glog-960bd493-65f2-43d9-8f50-3cae954cc036",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of dynamic memory allocation using the `malloc` function. This can lead to various issues such as buffer overflows, memory leaks, or undefined behavior if the allocated memory is not properly managed. The vulnerability often occurs when the size of the memory to be allocated is not correctly calculated or checked, leading to insufficient memory allocation or excessive allocation that can be exploited.\n\n### General Mitigation Advice\n\n1. **Input Validation**: Always validate input sizes before using them in `malloc` to ensure they are within expected bounds.\n2. **Check Return Values**: Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safer Alternatives**: Consider using safer alternatives like `new` in C++ or smart pointers which automatically manage memory.\n4. **Free Allocated Memory**: Ensure that all dynamically allocated memory is properly freed when no longer needed to prevent memory leaks.\n5. **Boundary Checks**: Implement boundary checks to prevent buffer overflows.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for malloc and free\n\nint main() {\n    size_t buffer_size = 1024; // Example buffer size\n    if (buffer_size <= 0) {\n        std::cerr << \"Invalid buffer size\" << std::endl;\n        return 1;\n    }\n\n    // Allocate memory\n    char* buffer = (char*)malloc(buffer_size);\n    if (buffer == nullptr) {\n        std::cerr << \"Memory allocation failed\" << std::endl;\n        return 1;\n    }\n\n    // Use the buffer for some operations\n    // ...\n\n    // Free the allocated memory\n    free(buffer);\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<iostream>`: For input and output operations.\n- `<cstdlib>`: For `malloc` and `free` functions.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-023c05dc-ad2d-418a-bf1e-b2cd8eb80610",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability associated with the C function `memcpy` arises when there is a mismatch between the size of the source and destination buffers, leading to potential buffer overflows. In C++, this can result in undefined behavior, including data corruption, crashes, or security vulnerabilities such as arbitrary code execution. The specific vulnerability sink in the code example `memcpy(Arr.data(), data(), ArrSize)` occurs when `ArrSize` exceeds the size of the destination buffer `Arr.data()`, or if the source buffer `data()` is smaller than `ArrSize`.\n\n### General Mitigation Advice\n\n1. **Bounds Checking**: Always ensure that the size of the data being copied does not exceed the size of the destination buffer.\n2. **Use Safer Alternatives**: Consider using safer functions like `std::copy` or `std::memmove` which provide better safety guarantees.\n3. **Static Analysis Tools**: Utilize static analysis tools to detect potential buffer overflows during development.\n4. **Code Reviews**: Regularly perform code reviews to catch potential vulnerabilities early in the development process.\n\n### Source Code Fix Recommendation\n\nTo mitigate the vulnerability, ensure that the size of the data being copied does not exceed the size of the destination buffer. Here is a revised version of the code using `std::copy`:\n\n```cpp\n#include <algorithm> // for std::copy\n#include <vector>\n\nvoid safeCopy(std::vector<char>& Arr, const char* data, size_t dataSize) {\n    if (dataSize > Arr.size()) {\n        // Handle error: dataSize is larger than the destination buffer\n        return;\n    }\n    std::copy(data, data + dataSize, Arr.begin());\n}\n```\n\n### Library Dependencies\n\n- `<algorithm>`: Required for `std::copy`.\n- `<vector>`: Required for using `std::vector`.\n\n### Relevant OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n- [CWE-787: Out-of-bounds Write](https://cwe.mitre.org/data/definitions/787.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS121708"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-a7310a01-4795-4da8-b458-d89df71c6379",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "subprocess call with shell=True identified, security issue."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/site_scons/site_tools/gitversion.py"
+                },
+                "region": {
+                  "startLine": 122,
+                  "startColumn": 9,
+                  "endLine": 122,
+                  "endColumn": 92,
+                  "snippet": {
+                    "text": "    p = subprocess.Popen(cmd, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 121,
+                  "endLine": 123,
+                  "snippet": {
+                    "text": "    print ('Running cmd: '+cmd)\n    p = subprocess.Popen(cmd, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n    out, err = p.communicate()\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "HIGH",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-09c2c2ad-7e56-4f3f-9084-610e2ab0c50e",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 10673,
+                  "startColumn": 32,
+                  "endLine": 10673,
+                  "endColumn": 45,
+                  "charOffset": 395339,
+                  "charLength": 13,
+                  "snippet": {
+                    "text": "strlen(regex)",
+                    "rendered": {
+                      "text": "strlen(regex)",
+                      "markdown": "`strlen(regex)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 395339,
+                        "charLength": 13
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(regex, <size of regex>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 395339,
+                        "charLength": 13
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(regex, <size of regex>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-9a993236-e80f-44c6-a667-361d2a06ab4b",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Insecure URL"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 7046,
+                  "startColumn": 41,
+                  "endLine": 7046,
+                  "endColumn": 52,
+                  "charOffset": 262900,
+                  "charLength": 11,
+                  "snippet": {
+                    "text": "http://wiki",
+                    "rendered": {
+                      "text": "http://wiki",
+                      "markdown": "`http://wiki`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "An HTTP-based URL without TLS was detected."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 262900,
+                        "charLength": 11
+                      },
+                      "insertedContent": {
+                        "text": "https://wiki"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Moderate",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "ThreatModel.Integration.HTTP"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-27718ee5-0f0c-4894-b7c3-87553b3da9fc",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 6023,
+                  "startColumn": 17,
+                  "endLine": 6023,
+                  "endColumn": 28,
+                  "charOffset": 224849,
+                  "charLength": 11,
+                  "snippet": {
+                    "text": "strlen(str)",
+                    "rendered": {
+                      "text": "strlen(str)",
+                      "markdown": "`strlen(str)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 224849,
+                        "charLength": 11
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(str, <size of str>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 224849,
+                        "charLength": 11
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(str, <size of str>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-305d4cc5-e5e9-42ca-8e81-ffd88e3d79bf",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 5415,
+                  "startColumn": 31,
+                  "endLine": 5415,
+                  "endColumn": 44,
+                  "charOffset": 202400,
+                  "charLength": 13,
+                  "snippet": {
+                    "text": "strlen(\"]]>\")",
+                    "rendered": {
+                      "text": "strlen(\"]]>\")",
+                      "markdown": "`strlen(\"]]>\")`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 202400,
+                        "charLength": 13
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(\"]]>\", <size of \"]]>\">)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 202400,
+                        "charLength": 13
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(\"]]>\", <size of \"]]>\">)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-09ec0439-c42b-4716-8ac7-dbe800d56ff7",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Insecure URL"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 8592,
+                  "startColumn": 13,
+                  "endLine": 8592,
+                  "endColumn": 38,
+                  "charOffset": 321396,
+                  "charLength": 25,
+                  "snippet": {
+                    "text": "http://msdn.microsoft.com",
+                    "rendered": {
+                      "text": "http://msdn.microsoft.com",
+                      "markdown": "`http://msdn.microsoft.com`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "An HTTP-based URL without TLS was detected."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 321396,
+                        "charLength": 25
+                      },
+                      "insertedContent": {
+                        "text": "https://msdn.microsoft.com"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Moderate",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "ThreatModel.Integration.HTTP"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-50e66a79-1ece-44d2-8656-c20352b66268",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 7806,
+                  "startColumn": 20,
+                  "endLine": 7806,
+                  "endColumn": 36,
+                  "charOffset": 291851,
+                  "charLength": 16,
+                  "snippet": {
+                    "text": "strlen(temp_dir)",
+                    "rendered": {
+                      "text": "strlen(temp_dir)",
+                      "markdown": "`strlen(temp_dir)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 291851,
+                        "charLength": 16
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(temp_dir, <size of temp_dir>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 291851,
+                        "charLength": 16
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(temp_dir, <size of temp_dir>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-6af74587-c308-4c07-89bd-a4501604c18c",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 7383,
+                  "startColumn": 28,
+                  "endLine": 7383,
+                  "endColumn": 42,
+                  "charOffset": 275829,
+                  "charLength": 14,
+                  "snippet": {
+                    "text": "strlen(prefix)",
+                    "rendered": {
+                      "text": "strlen(prefix)",
+                      "markdown": "`strlen(prefix)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 275829,
+                        "charLength": 14
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(prefix, <size of prefix>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 275829,
+                        "charLength": 14
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(prefix, <size of prefix>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-545304a9-7e8a-455d-a3f9-daae432443ca",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/acos/test_acos_data.h"
+                },
+                "region": {
+                  "startLine": 172,
+                  "startColumn": 16,
+                  "endLine": 172,
+                  "endColumn": 20,
+                  "charOffset": 7909,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-a2d72643-9346-4c07-9dce-a1b95886880b",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/acos/test_acos_data.h"
+                },
+                "region": {
+                  "startLine": 171,
+                  "startColumn": 16,
+                  "endLine": 171,
+                  "endColumn": 20,
+                  "charOffset": 7870,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-c5e8c90d-c0b1-4eb2-b49c-8b2b8d373feb",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/acos/test_acos_data.h"
+                },
+                "region": {
+                  "startLine": 170,
+                  "startColumn": 16,
+                  "endLine": 170,
+                  "endColumn": 20,
+                  "charOffset": 7834,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-29a01cc3-e7fb-4b99-bb92-8329f0656469",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/fabs/test_fabs_data.h"
+                },
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 16,
+                  "endLine": 174,
+                  "endColumn": 20,
+                  "charOffset": 7732,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-727f93b6-9e74-427c-aa06-096f2e070ba9",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/fabs/test_fabs_data.h"
+                },
+                "region": {
+                  "startLine": 173,
+                  "startColumn": 16,
+                  "endLine": 173,
+                  "endColumn": 20,
+                  "charOffset": 7693,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-eff5a787-d8c5-49c3-8ea3-42cb0ed7cf27",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/fabs/test_fabs_data.h"
+                },
+                "region": {
+                  "startLine": 172,
+                  "startColumn": 16,
+                  "endLine": 172,
+                  "endColumn": 20,
+                  "charOffset": 7657,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-4bc26ddf-3cf9-45ed-bdbd-48c22f87f0ea",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/asin/test_asin_data.h"
+                },
+                "region": {
+                  "startLine": 185,
+                  "startColumn": 16,
+                  "endLine": 185,
+                  "endColumn": 20,
+                  "charOffset": 8774,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-0cbe5748-97d7-464e-9e86-d6f24ceaa374",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/asin/test_asin_data.h"
+                },
+                "region": {
+                  "startLine": 184,
+                  "startColumn": 16,
+                  "endLine": 184,
+                  "endColumn": 20,
+                  "charOffset": 8723,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-7c798784-b295-4314-ba96-a64fbc78869a",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/asin/test_asin_data.h"
+                },
+                "region": {
+                  "startLine": 183,
+                  "startColumn": 16,
+                  "endLine": 183,
+                  "endColumn": 20,
+                  "charOffset": 8675,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-e08dc5db-b19a-478e-8bb5-469a94b3816a",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Generic: Hard-coded Elliptic Curve"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/cbrt/test_cbrt_data.h"
+                },
+                "region": {
+                  "startLine": 238,
+                  "startColumn": 16,
+                  "endLine": 238,
+                  "endColumn": 20,
+                  "charOffset": 11087,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "X448",
+                    "rendered": {
+                      "text": "X448",
+                      "markdown": "`X448`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "ManualReview",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "Cryptography.Protocol.TLS.Elliptic-Curve.Hard-Coded"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-232e8855-3253-46dd-b0fe-06ba51798b4a",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 2520,
+                  "startColumn": 21,
+                  "endLine": 2520,
+                  "endColumn": 33,
+                  "charOffset": 97310,
+                  "charLength": 12,
+                  "snippet": {
+                    "text": "strlen(ansi)",
+                    "rendered": {
+                      "text": "strlen(ansi)",
+                      "markdown": "`strlen(ansi)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 97310,
+                        "charLength": 12
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(ansi, <size of ansi>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 97310,
+                        "charLength": 12
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(ansi, <size of ansi>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-49228a35-d1b7-4a6e-a553-b2c501144c66",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Insecure URL"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                },
+                "region": {
+                  "startLine": 2473,
+                  "startColumn": 5,
+                  "endLine": 2473,
+                  "endColumn": 34,
+                  "charOffset": 95710,
+                  "charLength": 29,
+                  "snippet": {
+                    "text": "http://analogous.blogspot.com",
+                    "rendered": {
+                      "text": "http://analogous.blogspot.com",
+                      "markdown": "`http://analogous.blogspot.com`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "An HTTP-based URL without TLS was detected."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gtest/src/gtest_all.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 95710,
+                        "charLength": 29
+                      },
+                      "insertedContent": {
+                        "text": "https://analogous.blogspot.com"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Moderate",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "ThreatModel.Integration.HTTP"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-f3a3934d-7bfb-4d6e-b75b-86ed8fc3776b",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Insecure URL"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gbench/src/commandlineflags.cc"
+                },
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 7,
+                  "endLine": 7,
+                  "endColumn": 28,
+                  "charOffset": 242,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "http://www.apache.org",
+                    "rendered": {
+                      "text": "http://www.apache.org",
+                      "markdown": "`http://www.apache.org`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "An HTTP-based URL without TLS was detected."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gbench/src/commandlineflags.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 242,
+                        "charLength": 21
+                      },
+                      "insertedContent": {
+                        "text": "https://www.apache.org"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Moderate",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "ThreatModel.Integration.HTTP"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-b68ae9c3-c070-4c96-a650-3c57ecc93224",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Insecure URL"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gbench/src/colorprint.cc"
+                },
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 7,
+                  "endLine": 7,
+                  "endColumn": 28,
+                  "charOffset": 242,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "http://www.apache.org",
+                    "rendered": {
+                      "text": "http://www.apache.org",
+                      "markdown": "`http://www.apache.org`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "An HTTP-based URL without TLS was detected."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gbench/src/colorprint.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 242,
+                        "charLength": 21
+                      },
+                      "insertedContent": {
+                        "text": "https://www.apache.org"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Moderate",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "ThreatModel.Integration.HTTP"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-7dfdae57-fa3d-43eb-9b29-eaecc0bde4b3",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Insecure URL"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gbench/src/benchmark.cc"
+                },
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 7,
+                  "endLine": 7,
+                  "endColumn": 28,
+                  "charOffset": 242,
+                  "charLength": 21,
+                  "snippet": {
+                    "text": "http://www.apache.org",
+                    "rendered": {
+                      "text": "http://www.apache.org",
+                      "markdown": "`http://www.apache.org`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "An HTTP-based URL without TLS was detected."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gbench/src/benchmark.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 242,
+                        "charLength": 21
+                      },
+                      "insertedContent": {
+                        "text": "https://www.apache.org"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Moderate",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "ThreatModel.Integration.HTTP"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-960bd493-65f2-43d9-8f50-3cae954cc036",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (malloc)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gbench/src/sysinfo.cc"
+                },
+                "region": {
+                  "startLine": 325,
+                  "startColumn": 20,
+                  "endLine": 325,
+                  "endColumn": 39,
+                  "charOffset": 9446,
+                  "charLength": 19,
+                  "snippet": {
+                    "text": "malloc(buffer_size)",
+                    "rendered": {
+                      "text": "malloc(buffer_size)",
+                      "markdown": "`malloc(buffer_size)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gbench/src/sysinfo.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 9446,
+                        "charLength": 19
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-023c05dc-ad2d-418a-bf1e-b2cd8eb80610",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (memcpy)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gtests/gapi/gbench/src/sysinfo.cc"
+                },
+                "region": {
+                  "startLine": 138,
+                  "startColumn": 9,
+                  "endLine": 138,
+                  "endColumn": 44,
+                  "charOffset": 3860,
+                  "charLength": 35,
+                  "snippet": {
+                    "text": "memcpy(Arr.data(), data(), ArrSize)",
+                    "rendered": {
+                      "text": "memcpy(Arr.data(), data(), ArrSize)",
+                      "markdown": "`memcpy(Arr.data(), data(), ArrSize)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "There are a number of conditions in which memcpy can introduce a vulnerability (mismatched buffer sizes, null pointers, etc.). More secure alternitives perform additional validation of the source and destination buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "gtests/gapi/gbench/src/sysinfo.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 3860,
+                        "charLength": 35
+                      },
+                      "insertedContent": {
+                        "text": "memcpy_s(Arr.data(), <size of Arr.data()>,  data(),  ArrSize)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
